@@ -6,8 +6,8 @@ import time
 
 import numpy as np
 
-from snake_base import SnakeBase
-from libs.consts import Direction, PlatEnum
+from games.snake_base import SnakeBase
+from games.libs.consts import Direction, PlatEnum
 
 
 class SnakeCanvas(SnakeBase):

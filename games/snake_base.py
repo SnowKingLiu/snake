@@ -4,7 +4,7 @@ import copy
 import random
 
 import numpy as np
-from libs.consts import Direction, PlatEnum
+from games.libs.consts import Direction, PlatEnum
 
 
 class Plat(object):
