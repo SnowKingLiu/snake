@@ -144,8 +144,8 @@ class Plat(object):
     def get_food_num(self):
         n = np.where(
             (PlatEnum.Food_SMALL.value == self.plat)
-            | (PlatEnum.Food_MIDDLE.value == sb.plat.plat)
-            | (PlatEnum.Food_LARGE.value == sb.plat.plat)
+            | (PlatEnum.Food_MIDDLE.value == self.plat)
+            | (PlatEnum.Food_LARGE.value == self.plat)
         )
         if not n:
             return 0
@@ -185,7 +185,7 @@ class SnakeBase(object):
         self.height = height
         self.food_scores = food_scores
         self.snake_num = snake_num
-        self.snake_init_coord = [width // 2, height // 2]
+        self.snake_init_coord = [height // 2, width // 2]
         self.revive = revive
         self.snakes = {}
         self.food_score_map = self.init_score_map()
@@ -351,9 +351,6 @@ class SnakeBase(object):
             next_item == PlatEnum.SnakeBody.value and next_coord == snake.bodies[-1]
         ):
             self.move(snake, next_coord)
-
-        # TODO
-        self.print_plat()
 
     def print_plat(self):
         plat = self.get_merge_snake_plat()
