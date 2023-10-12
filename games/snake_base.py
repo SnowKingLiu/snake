@@ -84,7 +84,7 @@ class Plat(object):
             raise Exception("Bombs num is illegal.")
         plat = copy.deepcopy(self.plat)
         # Snake init coord
-        plat[self.width // 2][self.height // 2] = -1
+        plat[self.height // 2][self.width // 2] = -1
         remaining_bombs_num = self.bomb_num
         while remaining_bombs_num:
             point = self.get_random_ground(plat)
@@ -97,10 +97,11 @@ class Plat(object):
             else:
                 plat[point[0]][point[1]] = -1
 
-    def supplement_food(self, food_num=1):
-        plat = copy.deepcopy(self.plat)
+    def supplement_food(self, plat=None, food_num=1):
+        if plat is None:
+            plat = copy.deepcopy(self.plat)
         # Snake init coord
-        plat[self.width // 2][self.height // 2] = -1
+        plat[self.height // 2][self.width // 2] = -1
         for _ in range(food_num):
             if len(self.score_map) == 1:
                 food = PlatEnum.Food_MIDDLE.value
@@ -131,7 +132,7 @@ class Plat(object):
             or self.food_num >= self.width * self.height - self.bomb_num
         ):
             raise Exception("food num is illegal.")
-        self.supplement_food(self.food_num)
+        self.supplement_food(food_num=self.food_num)
 
     def reset(self):
         # Clear the map
@@ -328,7 +329,7 @@ class SnakeBase(object):
             food_num = self.plat.get_food_num()
             if food_num < self.food_num:
                 if not self.is_full():
-                    self.plat.supplement_food()
+                    self.plat.supplement_food(self.get_merge_snake_plat())
             if food_num == 0:
                 # Win
                 self.terminal = True
@@ -363,88 +364,6 @@ class SnakeBase(object):
             return True
 
         return ground[0].size <= 1
-
-    def eat_food(self, food_coord):
-        self.plat[food_coord[0]][food_coord[1]] = PlatEnum.Ground.value
-        self.foods.remove(food_coord)
-
-    def create_snake_body(self, body_coord):
-        self.plat[body_coord[0]][body_coord[1]] = PlatEnum.SnakeBody.value
-        self.snake.append(body_coord)
-
-    def get_distance(self):
-        if self.food_num != 1:
-            return 0
-        return (self.foods[0][0] - self.snake[0][0]) ** 2 + (
-            self.foods[0][1] - self.snake[0][1]
-        ) ** 2
-
-    def add_reward(self, value=1):
-        self.reward += value
-
-    def reduce_reward(self, value=1.0):
-        self.reward -= value
-
-    def set_direction(self, direction: Direction):
-        if self.snake_direction == Direction.UP:
-            if direction in [Direction.RIGHT, Direction.LEFT]:
-                self.snake_direction = direction
-
-        elif self.snake_direction == Direction.LEFT:
-            if direction in [Direction.UP, Direction.DOWN]:
-                self.snake_direction = direction
-
-        elif self.snake_direction == Direction.RIGHT:
-            if direction in [Direction.UP, Direction.DOWN]:
-                self.snake_direction = direction
-
-        elif self.snake_direction == Direction.DOWN:
-            if direction in [Direction.RIGHT, Direction.LEFT]:
-                self.snake_direction = direction
-        else:
-            raise Exception(f"Unknown direction. {direction}")
-
-    @staticmethod
-    def euclid_dis_sim(x, y):
-        """
-        欧几里得相似度
-        :param x:
-        :param y:
-        :return:
-        """
-        return np.sqrt(np.sum((x - y) ** 2))
-
-    def get_state(self):
-        """
-        0、地图
-        :return:
-        """
-        return np.hstack(
-            [self.plat.flatten(), self.get_action_by_direction(self.snake_direction)]
-        )
-
-    @staticmethod
-    def get_direction_by_action(action: int) -> Direction:
-        return [
-            Direction.UP,
-            Direction.LEFT,
-            Direction.RIGHT,
-            Direction.DOWN,
-        ][action]
-
-    @staticmethod
-    def get_action_by_direction(direction: Direction) -> int:
-        return [
-            Direction.UP,
-            Direction.LEFT,
-            Direction.RIGHT,
-            Direction.DOWN,
-        ].index(direction)
-
-    def do_action(self, direction: Direction):
-        self.set_direction(direction)
-        self.run_a_turn()
-        return self.get_state()
 
 
 if __name__ == "__main__":

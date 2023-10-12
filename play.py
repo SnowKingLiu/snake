@@ -11,7 +11,7 @@ def main():
         food_num=5,
         revive=True,
         # Number of player(s)
-        snake_num=2,
+        snake_num=1,
         # Screen size
         unit=15,
     )

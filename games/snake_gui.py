@@ -70,7 +70,7 @@ class SnakeCanvas(SnakeBase):
 
     def snake_thread(self):
         while not self.stop:
-            time.sleep(2000)
+            time.sleep(2)
 
     def exit(self):
         self.stop = True
@@ -79,6 +79,27 @@ class SnakeCanvas(SnakeBase):
 
     def reset_game(self):
         self.reset()
+
+        for bomb in self.cv_bombs:
+            self.canvas.delete(bomb)
+        self.cv_bombs = []
+
+        for food in self.cv_foods.values():
+            self.canvas.delete(food)
+        self.cv_foods = {}
+
+        for snake in self.cv_snakes.values():
+            self.canvas.delete(snake["head"][1])
+            for body in snake["body"]:
+                self.canvas.delete(body[1])
+        self.cv_snakes = {}
+
+        for header in self.cv_headers.values():
+            self.canvas.delete(header)
+
+        self.build_ui()
+        self.init_envs()
+
         self.update_map()
 
     def get_direction(self, keysym):
@@ -94,10 +115,10 @@ class SnakeCanvas(SnakeBase):
         }
         if keysym == "Escape":
             self.exit()
-            return
+            return None, None
         if keysym == "space":
             self.reset_game()
-            return
+            return None, None
 
         return directs_map.get(keysym, [None, None])
 
@@ -284,7 +305,7 @@ class SnakeCanvas(SnakeBase):
             if len(self.snakes) > 1:
                 text = f"Player {snake_id} score: {sum(snake.score)}"
             else:
-                text = f"Score: {sum(snakes[0].score)}"
+                text = f"Score: {sum(snake.score)}"
             self.cv_headers[snake_id] = self.canvas.create_text(
                 self.canvas_width // 2,
                 (3 + snake_id * 3) * self.unit,
